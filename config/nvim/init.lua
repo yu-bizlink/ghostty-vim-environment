@@ -29,7 +29,14 @@ require("lazy").setup({
     name = "catppuccin",
     priority = 1000,
     config = function()
-      vim.cmd.colorscheme "catppuccin-mocha"
+      require("catppuccin").setup({
+        flavour = "auto", -- システムのライト/ダークモードに自動対応
+        background = {
+          light = "latte",
+          dark = "mocha",
+        },
+      })
+      vim.cmd.colorscheme "catppuccin"
     end,
   },
 
