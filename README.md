@@ -1,40 +1,40 @@
-# Ghostty Vim Environment
+# Ghostty Environment
 
-Ghosttyのスプリット機能を活用した、5ペイン構成のVim風統合開発環境
+Ghosttyのスプリット機能を活用した、3ペイン構成のシンプルな統合開発環境
 
-![Version](https://img.shields.io/badge/version-1.0.0-blue)
+![Version](https://img.shields.io/badge/version-2.0.0-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
 ## 概要
 
-Ghosttyターミナルエミュレータ上で、Neovim、filetree、keifu、Claude Codeを統合した効率的な開発環境です。
+Ghosttyターミナルエミュレータ上で、filetree、keifu、Claude Codeを統合した効率的な開発環境です。
 
 ### レイアウト
 
 ```
-+--------+----------------+----------------+
-| file   |                | Claude Code    |
-| tree   |     Neovim     | (開発用)       |
-| 20%    |     40%        | 40%            |
-+--------+                +----------------+
-| keifu  |                | Claude Code    |
-| 20%    |                | (参照/調査用)  |
-+--------+----------------+----------------+
++--------+----------------+
+| file   |                |
+| tree   |                |
+| 60%    |  Claude Code   |
++--------+     (70%)      |
+| keifu  |                |
+| 40%    |                |
++--------+----------------+
+  30%
 ```
 
 ## 特徴
 
-- 🚀 **ワンコマンド起動** - `gvim`で5ペイン環境を自動構築
-- 📁 **統合ファイルツリー** - filetreeからNeovimへシームレスに編集
+- 🚀 **ワンコマンド起動** - `gvim`で3ペイン環境を自動構築
+- 📁 **統合ファイルツリー** - filetreeでファイル管理とGit状態確認
 - 🌳 **Git可視化** - keifuでコミット履歴をリアルタイム表示
-- 🤖 **デュアルClaude** - 開発用と参照用の2インスタンス
+- 🤖 **Claude Code統合** - AIペアプログラミングと開発支援
 - ⚡ **ホットリロード** - 設定変更を即座に反映
-- ⌨️ **Vim風操作** - Ctrl+Cmd+H/J/K/Lでペイン移動
+- ⌨️ **直感的な操作** - Ctrl+Cmd+H/J/K/Lでペイン移動
 
 ## 技術スタック
 
 - **Ghostty** - 高速ターミナルエミュレータ
-- **Neovim v0.11+** - LSP、Treesitter対応エディタ
 - **filetree** - Rust製TUIファイルエクスプローラー
 - **keifu** - Rust製Git可視化ツール
 - **Claude Code** - AIペアプログラミング
@@ -70,9 +70,6 @@ ghostty-vim-check
 #### 1. 必須ツールのインストール
 
 ```bash
-# Neovim
-brew install neovim
-
 # Nerd Font
 brew install --cask font-jetbrains-mono-nerd-font
 
@@ -84,10 +81,6 @@ cargo install keifu
 #### 2. 設定ファイルのコピー
 
 ```bash
-# Neovim設定
-mkdir -p ~/.config/nvim
-cp config/nvim/init.lua ~/.config/nvim/
-
 # ツール設定
 mkdir -p ~/.config/filetree ~/.config/keifu
 cp config/filetree/config.toml ~/.config/filetree/
@@ -143,16 +136,14 @@ ghostty-vim-check
 | `Cmd+Shift+D` | 下にスプリット |
 | `Cmd+W` | ペインを閉じる |
 
-#### Neovim内
+#### filetree内
 
 | キー | 機能 |
 |------|------|
-| `Space+W` | ファイル保存 |
-| `Space+Q` | 終了 |
-| `Space+E` | ファイルエクスプローラー |
-| `gd` | 定義へジャンプ |
-| `K` | ドキュメント表示 |
-| `Space+rn` | 変数リネーム |
+| `j/k` | 上下移動 |
+| `l` または `Enter` | ディレクトリ展開/ファイル選択 |
+| `h` | ディレクトリを閉じる |
+| `Space` | 複数選択 |
 
 ## 初回セットアップ
 
@@ -163,10 +154,6 @@ ghostty-vim-check
 1. **システム環境設定** → **プライバシーとセキュリティ** → **アクセシビリティ**
 2. Ghostty、ターミナル、osascriptに権限を付与
 3. `gvim`を再実行
-
-### Neovimプラグインのインストール
-
-初回起動時、自動的にプラグインがインストールされます（1〜2分）。
 
 ## ホットリロード
 
@@ -179,10 +166,6 @@ ghostty-vim-check
 - **Ghostty設定** (`~/Library/Application Support/com.mitchellh.ghostty/config`)
   - 保存すると即座にGhosttyがリロード
   - macOS通知で完了を確認
-
-- **Neovim設定** (`~/.config/nvim/init.lua`)
-  - 保存すると実行中のNeovimに反映
-  - 一部の変更は再起動が必要
 
 - **filetree設定** (`~/.config/filetree/config.toml`)
   - 保存すると通知表示
@@ -197,10 +180,6 @@ ghostty-vim-check
 ```bash
 # 環境起動（ホットリロードも自動起動）
 gvim
-
-# 設定を編集
-nvim ~/.config/nvim/init.lua
-# 保存すると自動的に反映される
 
 # ホットリロードのログを確認
 tail -f /tmp/ghostty-vim-hotreload.log
@@ -223,20 +202,11 @@ ghostty-vim-hotreload
 
 ## トラブルシューティング
 
-### filetreeからファイルが開けない
-
-```bash
-# ソケット確認
-cat /tmp/nvim-ghostty-socket
-
-# 手動テスト
-nvim --server $(cat /tmp/nvim-ghostty-socket) --remote ~/testfile.txt
-```
-
 ### レイアウトが崩れる
 
-1. Ghosttyウィンドウを最大化（推奨: 240列以上）
+1. Ghosttyウィンドウを十分な大きさに調整（推奨: 150列以上）
 2. `Ctrl+Cmd+E`でペイン均等化
+3. `Ctrl+Cmd+Shift+H/L`で左右のペインサイズを調整
 
 ### keifuが動作しない
 
@@ -249,23 +219,6 @@ git init
 ```
 
 ## カスタマイズ
-
-### Neovim設定
-
-`~/.config/nvim/init.lua`を編集：
-
-```lua
--- リーダーキーを変更
-vim.g.mapleader = ","
-
--- 追加プラグイン
-{
-  "github/copilot.vim",
-  config = function()
-    -- 設定
-  end,
-}
-```
 
 ### Ghostty設定
 
@@ -286,14 +239,13 @@ ghostty-vim-environment/
 ├── install.sh                # インストールスクリプト
 ├── bin/                      # 実行スクリプト
 │   ├── ghostty-vim-project   # メイン起動スクリプト
-│   ├── ghostty-pane-nvim     # Neovimペイン
 │   ├── ghostty-pane-filetree # filetreeペイン
 │   ├── ghostty-pane-keifu    # keifuペイン
 │   ├── ghostty-pane-claude   # Claude Codeペイン
+│   ├── ghostty-vim-hotreload # ホットリロード機能
+│   ├── ghostty-vim-stop      # ホットリロード停止
 │   └── ghostty-vim-check     # 確認スクリプト
 ├── config/                   # 設定ファイル
-│   ├── nvim/
-│   │   └── init.lua          # Neovim設定
 │   ├── filetree/
 │   │   └── config.toml       # filetree設定
 │   ├── keifu/
@@ -324,18 +276,16 @@ MIT License - 詳細は[LICENSE](LICENSE)を参照
 ## クレジット
 
 - [Ghostty](https://github.com/mitchellh/ghostty) - Mitchell Hashimoto
-- [Neovim](https://neovim.io/) - Neovim Project
 - [filetree](https://github.com/IndianBoy42/filetree.nvim) - Rust TUI
 - [keifu](https://github.com/robatipoor/keifu) - Git visualization
+- [Claude Code](https://claude.ai/code) - Anthropic
 
 ## 関連リンク
 
 - [Ghostty公式サイト](https://ghostty.org/)
-- [Neovim公式ドキュメント](https://neovim.io/doc/)
 - [Claude Code](https://claude.ai/code)
 
 ---
 
-**作成者**: [YOUR_NAME]
-**バージョン**: 1.0.0
+**バージョン**: 2.0.0
 **更新日**: 2026-01-17
