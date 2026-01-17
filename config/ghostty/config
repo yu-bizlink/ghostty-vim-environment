@@ -1,0 +1,27 @@
+# ========================================
+# Ghostty Vim環境用の設定
+# ========================================
+# この設定を既存のGhostty configファイルに追記してください
+
+# より広いレイアウト用（5ペイン表示に最適）
+window-width = 240
+window-height = 50
+
+# カーソル設定（Neovimとの視認性向上）
+cursor-style = block
+cursor-style-blink = false
+
+# ウィンドウタイトル
+window-title-format = "Ghostty Vim - {title}"
+
+# スプリットのリサイズ（Vim風）
+keybind = ctrl+cmd+shift+h=resize_split:left,10
+keybind = ctrl+cmd+shift+l=resize_split:right,10
+keybind = ctrl+cmd+shift+j=resize_split:down,10
+keybind = ctrl+cmd+shift+k=resize_split:up,10
+
+# すべてのスプリットを均等化
+keybind = ctrl+cmd+e=equalize_splits
+
+# 設定リロード（エラー回避のため削除）
+# keybind = cmd+shift+comma=reload_config

@@ -1,0 +1,6 @@
+[general]
+max_commits = 100
+graph_style = "unicode"
+
+[colors]
+branch_colors = ["blue", "green", "yellow", "red", "magenta", "cyan"]

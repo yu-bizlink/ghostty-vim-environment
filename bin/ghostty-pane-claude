@@ -1,0 +1,5 @@
+#!/bin/bash
+# Claude Codeペインの起動スクリプト
+
+cd "${1:-$PWD}"
+exec claude

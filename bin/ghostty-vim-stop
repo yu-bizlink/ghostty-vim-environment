@@ -1,0 +1,13 @@
+#!/bin/bash
+# Ghostty Vim環境のホットリロード機能を停止
+
+echo "ホットリロード機能を停止しています..."
+
+# ホットリロードプロセスを停止
+pkill -f "ghostty-vim-hotreload"
+
+if [ $? -eq 0 ]; then
+    echo "✓ ホットリロード機能を停止しました"
+else
+    echo "⚠ ホットリロードプロセスが見つかりませんでした"
+fi

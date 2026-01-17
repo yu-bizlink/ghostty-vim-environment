@@ -1,0 +1,83 @@
+#!/bin/bash
+# Ghostty Vim環境の統合起動スクリプト (AppleScript版)
+
+set -e
+
+PROJECT_DIR="${1:-$PWD}"
+
+if [ ! -d "$PROJECT_DIR" ]; then
+    echo "エラー: ディレクトリが存在しません: $PROJECT_DIR"
+    exit 1
+fi
+
+# プロジェクトディレクトリを絶対パスに変換
+PROJECT_DIR=$(cd "$PROJECT_DIR" && pwd)
+
+echo "プロジェクト: $PROJECT_DIR"
+
+# ホットリロード機能を起動（バックグラウンド）
+if ! pgrep -f "ghostty-vim-hotreload" > /dev/null; then
+    nohup ghostty-vim-hotreload > /tmp/ghostty-vim-hotreload.log 2>&1 &
+    echo "✓ ホットリロード機能を起動"
+fi
+
+# Ghosttyで5ペインレイアウトを構築
+# レイアウト: 左20% (filetree上, keifu下), 中40% (Neovim), 右40% (Claude上下)
+
+osascript << EOF
+tell application "Ghostty"
+    activate
+end tell
+
+delay 0.5
+
+tell application "System Events"
+    -- 最初のペイン: filetree (左上)
+    keystroke "ghostty-pane-filetree '$PROJECT_DIR'"
+    keystroke return
+    delay 1.5
+
+    -- 下にスプリット: keifu (左下)
+    keystroke "d" using {command down, shift down}
+    delay 0.5
+    keystroke "ghostty-pane-keifu '$PROJECT_DIR'"
+    keystroke return
+    delay 1.5
+
+    -- 左上のfiletreeペインに移動
+    keystroke "k" using {command down, control down}
+    delay 0.3
+
+    -- 右にスプリット: Neovim (中央)
+    keystroke "d" using command down
+    delay 0.5
+    keystroke "ghostty-pane-nvim '$PROJECT_DIR'"
+    keystroke return
+    delay 1.5
+
+    -- 右にスプリット: Claude Code (右上)
+    keystroke "d" using command down
+    delay 0.5
+    keystroke "ghostty-pane-claude '$PROJECT_DIR'"
+    keystroke return
+    delay 1.5
+
+    -- 下にスプリット: Claude Code (右下)
+    keystroke "d" using {command down, shift down}
+    delay 0.5
+    keystroke "ghostty-pane-claude '$PROJECT_DIR'"
+    keystroke return
+    delay 0.5
+
+    -- Neovim (中央) にフォーカスを戻す
+    keystroke "h" using {command down, control down}
+    delay 0.3
+end tell
+EOF
+
+echo "✓ レイアウト構築完了"
+echo ""
+echo "キーバインド:"
+echo "  Ctrl+Cmd+H/J/K/L  - ペイン間移動"
+echo "  Cmd+W             - ペイン閉じる"
+echo "  Space+w           - Neovimで保存"

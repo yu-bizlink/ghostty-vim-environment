@@ -1,0 +1,90 @@
+#!/bin/bash
+# Ghostty Vim環境 ホットリロード機能
+# 設定ファイルの変更を監視し、自動的にリロードします
+
+GHOSTTY_CONFIG="$HOME/Library/Application Support/com.mitchellh.ghostty/config"
+NVIM_CONFIG="$HOME/.config/nvim/init.lua"
+FILETREE_CONFIG="$HOME/.config/filetree/config.toml"
+KEIFU_CONFIG="$HOME/.config/keifu/config.toml"
+
+echo "========================================="
+echo "Ghostty Vim環境 ホットリロード開始"
+echo "========================================="
+echo ""
+echo "監視中のファイル:"
+echo "  - $GHOSTTY_CONFIG"
+echo "  - $NVIM_CONFIG"
+echo "  - $FILETREE_CONFIG"
+echo "  - $KEIFU_CONFIG"
+echo ""
+echo "設定を変更すると自動的にリロードされます"
+echo "終了: Ctrl+C"
+echo ""
+
+# Ghosttyリロード関数
+reload_ghostty() {
+    echo "[$(date '+%H:%M:%S')] Ghostty設定を検知 - リロード中..."
+
+    # Ghosttyプロセスにシグナルを送る
+    # GhosttyはHUPシグナルで設定をリロード
+    pkill -HUP -f "Ghostty" 2>/dev/null || true
+
+    # AppleScriptで通知
+    osascript -e 'display notification "設定がリロードされました" with title "Ghostty Vim" sound name "Glass"' 2>/dev/null || true
+
+    echo "[$(date '+%H:%M:%S')] ✓ Ghostty設定をリロードしました"
+}
+
+# Neovimリロード関数
+reload_nvim() {
+    echo "[$(date '+%H:%M:%S')] Neovim設定を検知 - 再起動を推奨"
+
+    # 実行中のNeovimサーバーに通知
+    if [ -f /tmp/nvim-ghostty-socket ]; then
+        SOCKET=$(cat /tmp/nvim-ghostty-socket)
+        if [ -S "$SOCKET" ]; then
+            nvim --server "$SOCKET" --remote-send ':source ~/.config/nvim/init.lua<CR>' 2>/dev/null || true
+            echo "[$(date '+%H:%M:%S')] ✓ Neovim設定をリロードしました"
+        fi
+    fi
+
+    osascript -e 'display notification "init.luaを保存しました。一部の変更は再起動が必要です" with title "Neovim" sound name "Glass"' 2>/dev/null || true
+}
+
+# filetreeリロード関数
+reload_filetree() {
+    echo "[$(date '+%H:%M:%S')] filetree設定を検知 - 再起動を推奨"
+    osascript -e 'display notification "filetreeペインを再起動してください" with title "filetree" sound name "Glass"' 2>/dev/null || true
+}
+
+# keifuリロード関数
+reload_keifu() {
+    echo "[$(date '+%H:%M:%S')] keifu設定を検知 - 再起動を推奨"
+    osascript -e 'display notification "keifuペインを再起動してください" with title "keifu" sound name "Glass"' 2>/dev/null || true
+}
+
+# fswatchで監視開始
+fswatch -0 \
+    "$GHOSTTY_CONFIG" \
+    "$NVIM_CONFIG" \
+    "$FILETREE_CONFIG" \
+    "$KEIFU_CONFIG" \
+    2>/dev/null | while IFS= read -r -d "" file; do
+
+    case "$file" in
+        *"ghostty/config")
+            reload_ghostty
+            ;;
+        *"nvim/init.lua")
+            reload_nvim
+            ;;
+        *"filetree/config.toml")
+            reload_filetree
+            ;;
+        *"keifu/config.toml")
+            reload_keifu
+            ;;
+    esac
+
+    echo ""
+done

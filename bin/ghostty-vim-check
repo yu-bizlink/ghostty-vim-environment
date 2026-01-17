@@ -1,0 +1,58 @@
+#!/bin/bash
+# Ghostty Vim環境のインストール確認
+
+echo "=== Ghostty Vim環境 インストール確認 ==="
+echo ""
+
+check_command() {
+    local cmd=$1
+    local name=$2
+    if command -v "$cmd" &> /dev/null; then
+        echo "✓ $name: $(command -v $cmd)"
+        return 0
+    else
+        echo "✗ $name: 未インストール"
+        return 1
+    fi
+}
+
+errors=0
+
+check_command nvim "Neovim" || errors=$((errors+1))
+check_command ft "filetree" || errors=$((errors+1))
+check_command keifu "keifu" || errors=$((errors+1))
+check_command claude "Claude Code" || errors=$((errors+1))
+
+echo ""
+echo "=== スクリプトの確認 ==="
+
+check_script() {
+    local script=$1
+    local name=$2
+    if [ -x "$script" ]; then
+        echo "✓ $name"
+        return 0
+    else
+        echo "✗ $name: 存在しないか実行権限がありません"
+        return 1
+    fi
+}
+
+check_script "/Users/yu/.local/bin/ghostty-pane-filetree" "filetreeペイン" || errors=$((errors+1))
+check_script "/Users/yu/.local/bin/ghostty-pane-keifu" "keifuペイン" || errors=$((errors+1))
+check_script "/Users/yu/.local/bin/ghostty-pane-nvim" "Neovimペイン" || errors=$((errors+1))
+check_script "/Users/yu/.local/bin/ghostty-pane-claude" "Claude Codeペイン" || errors=$((errors+1))
+check_script "/Users/yu/.local/bin/ghostty-vim-project" "統合起動スクリプト" || errors=$((errors+1))
+
+echo ""
+if [ $errors -eq 0 ]; then
+    echo "✓ すべてのコンポーネントがインストールされています"
+    echo ""
+    echo "使用方法:"
+    echo "  gvim              # カレントディレクトリで起動"
+    echo "  gvim ~/projects   # 指定ディレクトリで起動"
+    exit 0
+else
+    echo "✗ $errors 個のコンポーネントが不足しています"
+    exit 1
+fi

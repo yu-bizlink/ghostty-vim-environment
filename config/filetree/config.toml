@@ -1,0 +1,10 @@
+[general]
+show_hidden = false
+show_git_status = true
+
+[colors]
+directory = "blue"
+file = "white"
+git_modified = "yellow"
+git_added = "green"
+git_deleted = "red"

@@ -1,0 +1,9 @@
+#!/bin/bash
+# filetreeペインの起動スクリプト
+
+cd "${1:-$PWD}"
+
+# Neovimリモート編集コマンドを設定
+export FILETREE_DEFAULT_CMD="nvim --server \$(cat /tmp/nvim-ghostty-socket 2>/dev/null || echo '/tmp/nvim.sock') --remote"
+
+exec ft
