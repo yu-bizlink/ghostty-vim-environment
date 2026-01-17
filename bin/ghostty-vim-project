@@ -1,5 +1,5 @@
 #!/bin/bash
-# Ghostty Vim環境の統合起動スクリプト (AppleScript版)
+# Ghostty統合起動スクリプト (3ペインレイアウト)
 
 set -e
 
@@ -21,8 +21,8 @@ if ! pgrep -f "ghostty-vim-hotreload" > /dev/null; then
     echo "✓ ホットリロード機能を起動"
 fi
 
-# Ghosttyで5ペインレイアウトを構築
-# レイアウト: 左20% (filetree上, keifu下), 中40% (Neovim), 右40% (Claude上下)
+# Ghosttyで3ペインレイアウトを構築
+# レイアウト: 左30% (filetree上60%, keifu下40%), 右70% (Claude Code)
 
 osascript << EOF
 tell application "Ghostty"
@@ -48,30 +48,12 @@ tell application "System Events"
     keystroke "k" using {command down, control down}
     delay 0.3
 
-    -- 右にスプリット: Neovim (中央)
-    keystroke "d" using command down
-    delay 0.5
-    keystroke "ghostty-pane-nvim '$PROJECT_DIR'"
-    keystroke return
-    delay 1.5
-
-    -- 右にスプリット: Claude Code (右上)
+    -- 右にスプリット: Claude Code (右側)
     keystroke "d" using command down
     delay 0.5
     keystroke "ghostty-pane-claude '$PROJECT_DIR'"
     keystroke return
-    delay 1.5
-
-    -- 下にスプリット: Claude Code (右下)
-    keystroke "d" using {command down, shift down}
     delay 0.5
-    keystroke "ghostty-pane-claude '$PROJECT_DIR'"
-    keystroke return
-    delay 0.5
-
-    -- Neovim (中央) にフォーカスを戻す
-    keystroke "h" using {command down, control down}
-    delay 0.3
 end tell
 EOF
 
@@ -80,4 +62,9 @@ echo ""
 echo "キーバインド:"
 echo "  Ctrl+Cmd+H/J/K/L  - ペイン間移動"
 echo "  Cmd+W             - ペイン閉じる"
-echo "  Space+w           - Neovimで保存"
+echo "  Ctrl+Cmd+E        - ペイン均等化"
+echo ""
+echo "ペイン構成:"
+echo "  左上: filetree (ファイルエクスプローラー)"
+echo "  左下: keifu (Git履歴)"
+echo "  右側: Claude Code (AI支援)"

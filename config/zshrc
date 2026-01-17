@@ -1,14 +1,11 @@
 # ========================================
-# Ghostty Vim環境
+# Ghostty環境
 # ========================================
 # この設定を~/.zshrcに追記してください
 
-# プロジェクトディレクトリでGhostty Vim環境を起動
+# プロジェクトディレクトリでGhostty環境を起動
 alias gvim='ghostty-vim-project'
 alias gvim-here='ghostty-vim-project .'
-
-# Neovimリモート編集（別ペインから使用）
-alias nv='nvim --server $(cat /tmp/nvim-ghostty-socket 2>/dev/null || echo "/tmp/nvim.sock") --remote'
 
 # PATH確認（~/.local/binをPATHに追加）
 export PATH="$HOME/.local/bin:$PATH"
